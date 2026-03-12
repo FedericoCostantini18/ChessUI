@@ -9,5 +9,9 @@ export const routes: Routes = [
   {
     path: 'home',
     loadComponent: () => import('./features/home/home-page.component').then(c => c.HomePageComponent)
+  },
+  {
+    path: 'menu',
+    loadComponent: () => import('./features/menu/main-menu/main-menu.component').then(c => c.MainMenuComponent)
   }
 ];

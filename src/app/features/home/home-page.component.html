@@ -8,4 +8,44 @@
     >
     <div class="stamp-overlay" [ngClass]="logoAnimationClass"></div>
   </div>
+
+  <div class="login-form" [ngClass]="{'show': showLoginForm}">
+    <div class="form-container">
+      
+      
+      <div class="input-row">
+        <div class="input-group">
+          <label for="username">Username</label>
+          <input 
+            type="text" 
+            id="username" 
+            [(ngModel)]="username"
+            placeholder="Inserisci username"
+            class="form-input"
+          >
+        </div>
+        
+        <div class="input-group">
+          <label for="password">Password</label>
+          <input 
+            type="password" 
+            id="password" 
+            [(ngModel)]="password"
+            placeholder="Inserisci password"
+            class="form-input"
+            (keyup.enter)="onProceed()"
+          >
+        </div>
+      </div>
+      
+      <button 
+        type="button" 
+        class="proceed-button"
+        (click)="onProceed()"
+        [disabled]="!username.trim() || !password.trim()"
+      >
+        Avanti
+      </button>
+    </div>
+  </div>
 </div>
