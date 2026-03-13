@@ -6,6 +6,12 @@
   padding: 0;
 }
 
+.main-content {
+  margin-top: 0; // Rimuove lo spazio per permettere la sovrapposizione
+  min-height: 100vh; // Altezza piena per coprire tutto lo schermo
+  width: 100%;
+}
+
 router-outlet {
   display: block;
   width: 100%;

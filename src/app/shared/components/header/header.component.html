@@ -1,0 +1,58 @@
+<header class="app-header">
+  <div class="header-container">
+    <!-- Hamburger Menu -->
+    <div class="hamburger-menu">
+      <button 
+        class="hamburger-button" 
+        (click)="toggleMenu()" 
+        [class.active]="isMenuOpen"
+        aria-label="Toggle navigation menu">
+        <span class="hamburger-line"></span>
+        <span class="hamburger-line"></span>
+        <span class="hamburger-line"></span>
+      </button>
+      
+      <!-- Navigation Menu Overlay -->
+      <div class="menu-overlay" *ngIf="isMenuOpen" (click)="closeMenus()">
+        <nav class="menu-nav" (click)="$event.stopPropagation()">
+          <ul class="menu-list">
+            <li><a (click)="navigateTo('/home')" class="menu-item">Home</a></li>
+            <li><a (click)="navigateTo('/game')" class="menu-item">Game</a></li>
+            <li><a (click)="navigateTo('/settings')" class="menu-item">Settings</a></li>
+            <li><a (click)="navigateTo('/menu')" class="menu-item">Menu</a></li>
+          </ul>
+        </nav>
+      </div>
+    </div>
+
+
+
+    <!-- Language Selector -->
+    <div class="language-selector">
+      <button 
+        class="language-button" 
+        (click)="toggleLanguageMenu()" 
+        [class.active]="isLanguageMenuOpen"
+        aria-label="Select language">
+        {{ currentLanguage }}
+        <span class="language-arrow" [class.rotated]="isLanguageMenuOpen">▼</span>
+      </button>
+      
+      <!-- Language Dropdown -->
+      <div class="language-dropdown" *ngIf="isLanguageMenuOpen">
+        <ul class="language-list">
+          <li 
+            *ngFor="let lang of availableLanguages" 
+            class="language-item"
+            [class.active]="lang === currentLanguage"
+            (click)="selectLanguage(lang)">
+            {{ lang }}
+          </li>
+        </ul>
+      </div>
+      
+      <!-- Language Menu Overlay -->
+      <div class="dropdown-overlay" *ngIf="isLanguageMenuOpen" (click)="closeMenus()"></div>
+    </div>
+  </div>
+</header>
