@@ -1,1 +1,50 @@
-<p>main-menu works!</p>
+<div class="home-container">
+
+  <!-- Main Content -->
+  <div class="main-content" [ngClass]="{'show': showContent}">
+    <!-- Site Description -->
+    <div class="description-section">
+      <h1 class="site-title">Omega Chess</h1>
+      <p class="site-description">
+        Benvenuto in Omega Chess, la piattaforma definitiva per sfidare intelligenze artificiali di diversi livelli. 
+        Scegli il tuo avversario e metti alla prova le tue abilità scacchistiche in partite emozionanti.
+      </p>
+    </div>
+
+    <!-- AI Selection Section -->
+    <div class="ai-selection-section">
+      <h2 class="section-title">Scegli il tuo avversario</h2>
+      <div class="ai-grid">
+        <div 
+          *ngFor="let ai of aiOpponents" 
+          class="ai-card"
+          [class.selected]="selectedAI?.id === ai.id"
+          (click)="selectAI(ai)">
+          <div class="ai-icon" [style.background-color]="ai.color">
+            {{ ai.icon }}
+          </div>
+          <div class="ai-info">
+            <h3 class="ai-name">{{ ai.name }}</h3>
+            <p class="ai-description">{{ ai.description }}</p>
+            <span class="ai-difficulty" [style.color]="ai.color">
+              {{ ai.difficulty }}
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Start Game Section -->
+    <div class="start-game-section">
+      <button 
+        type="button" 
+        class="start-game-button"
+        [class.ready]="selectedAI"
+        (click)="startGame()"
+        [disabled]="!selectedAI">
+        <span *ngIf="!selectedAI">Seleziona un avversario per iniziare</span>
+        <span *ngIf="selectedAI">Inizia la partita contro {{ selectedAI.name }}</span>
+      </button>
+    </div>
+  </div>
+</div>
