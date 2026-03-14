@@ -1,1 +1,46 @@
-<p>game-page works!</p>
+<div class="game-page">
+  <div class="game-header">
+    <h1>Partita di Scacchi</h1>
+  </div>
+
+  <!-- Info giocatori -->
+  <div class="players-info" *ngIf="players$ | async as players">
+    <div class="player-card black-player">
+      <div class="player-avatar">{{ players.black.avatar }}</div>
+      <div class="player-info">
+        <h3>{{ players.black.name }}</h3>
+        <span class="player-color">Nero</span>
+      </div>
+      <div class="current-turn" *ngIf="(currentPlayer$ | async) === 'black'">
+        <span class="turn-indicator">🎯</span>
+      </div>
+    </div>
+
+    <div class="vs-indicator">
+      <span>VS</span>
+    </div>
+
+    <div class="player-card white-player">
+      <div class="current-turn" *ngIf="(currentPlayer$ | async) === 'white'">
+        <span class="turn-indicator">🎯</span>
+      </div>
+      <div class="player-info">
+        <h3>{{ players.white.name }}</h3>
+        <span class="player-color">Bianco</span>
+      </div>
+      <div class="player-avatar">{{ players.white.avatar }}</div>
+    </div>
+  </div>
+
+  <!-- Scacchiera -->
+  <div class="board-container">
+    <app-chess-board></app-chess-board>
+  </div>
+
+  <!-- Info di gioco -->
+  <div class="game-info">
+    <div class="current-player-info" *ngIf="currentPlayer$ | async as currentPlayer">
+      <p>Turno di: <strong>{{ currentPlayer === 'white' ? 'Bianco' : 'Nero' }}</strong></p>
+    </div>
+  </div>
+</div>

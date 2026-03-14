@@ -1,1 +1,3 @@
-<p>chess-piece works!</p>
+<span class="chess-piece" [class.white]="piece?.color === 'white'" [class.black]="piece?.color === 'black'">
+  {{ getPieceSymbol() }}
+</span>
