@@ -1,0 +1,303 @@
+.home-container {
+  min-height: 100vh; // Altezza minima dello schermo, ma può crescere
+  width: 100vw;
+  background: radial-gradient(#a3a3a3 0%, #616161 50%, #252525 100%);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start; // Allinea dall'alto per permettere scroll
+  align-items: center;
+  overflow-y: auto; // Permette lo scroll verticale
+  padding: 20px;
+  padding-top: 80px; // Spazio per il header fisso
+}
+
+.logo-container {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 40px;
+}
+
+.logo {
+  max-width: 600px;
+  max-height: 600px;
+  opacity: 0;
+  transform: scale(0.5) rotate(-10deg);
+  filter: drop-shadow(0 0 20px rgba(0, 0, 0, 0.3));
+  transition: all 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+
+  &.stamp-animation {
+    opacity: 1;
+    transform: scale(1) rotate(0deg);
+    animation: stampBounce 0.8s ease-out;
+  }
+}
+
+.stamp-overlay {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 100%;
+  height: 100%;
+  border: 8px solid rgba(255, 255, 255, 0.6);
+  border-radius: 15px;
+  opacity: 0;
+  
+  &.stamp-animation {
+    animation: stampOverlay 1.2s ease-out;
+  }
+}
+
+@keyframes stampBounce {
+  0% {
+    transform: scale(0.5) rotate(-10deg);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.1) rotate(2deg);
+    opacity: 0.8;
+  }
+  70% {
+    transform: scale(0.95) rotate(-1deg);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1) rotate(0deg);
+    opacity: 1;
+  }
+}
+
+@keyframes stampOverlay {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.8);
+  }
+  30% {
+    opacity: 0.8;
+    transform: translate(-50%, -50%) scale(1.1);
+  }
+  60% {
+    opacity: 0.4;
+    transform: translate(-50%, -50%) scale(1.05);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+// Add a subtle floating animation after the stamp effect
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-10px) rotate(1deg);
+  }
+}
+
+.logo.stamp-animation {
+  animation: stampBounce 0.8s ease-out, float 3s ease-in-out 1s infinite;
+}
+
+// Main content container styles
+.main-content {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: all 0.8s ease;
+  max-width: 1000px;
+  width: 100%;
+  text-align: center;
+  
+  &.show {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// Site description section
+.description-section {
+  margin-bottom: 40px;
+  
+  .site-title {
+    color: white;
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 15px;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+  }
+  
+  .site-description {
+    color: #e0e0e0;
+    font-size: 1.1rem;
+    line-height: 1.6;
+    max-width: 600px;
+    margin: 0 auto;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+  }
+}
+
+// AI selection section
+.ai-selection-section {
+  margin-bottom: 40px;
+  
+  .section-title {
+    color: white;
+    font-size: 1.8rem;
+    font-weight: 600;
+    margin-bottom: 25px;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+  }
+  
+  .ai-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 20px;
+    max-width: 800px;
+    margin: 0 auto;
+  }
+  
+  .ai-card {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    border-radius: 15px;
+    padding: 20px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-align: center;
+    
+    &:hover {
+      background: rgba(255, 255, 255, 0.15);
+      border-color: rgba(255, 255, 255, 0.3);
+      transform: translateY(-5px);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    }
+    
+    &.selected {
+      background: rgba(255, 255, 255, 0.2);
+      border-color: rgba(255, 255, 255, 0.5);
+      transform: translateY(-3px);
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+    }
+  }
+  
+  .ai-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    margin: 0 auto 10px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  }
+  
+  .ai-info {
+    .ai-name {
+      color: white;
+      font-size: 1.3rem;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+    
+    .ai-description {
+      color: #e0e0e0;
+      font-size: 0.9rem;
+      line-height: 1.4;
+      margin-bottom: 10px;
+    }
+    
+    .ai-difficulty {
+      font-weight: 600;
+      font-size: 0.9rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+  }
+}
+
+// Start game section
+.start-game-section {
+  .start-game-button {
+    width: 100%;
+    max-width: 400px;
+    padding: 16px 32px;
+    background: linear-gradient(135deg, #6c757d, #495057);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin: 0 auto;
+    display: block;
+    
+    &:hover:not(:disabled) {
+      background: linear-gradient(135deg, #495057, #343a40);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+    }
+    
+    &:active:not(:disabled) {
+      transform: translateY(0);
+    }
+    
+    &.ready {
+      background: linear-gradient(135deg, #28a745, #20c997);
+      
+      &:hover {
+        background: linear-gradient(135deg, #20c997, #17a2b8);
+      }
+    }
+    
+    &:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      background: #6c757d;
+    }
+  }
+}
+
+// Responsive design
+@media (max-width: 768px) {
+  .home-container {
+    padding: 15px;
+  }
+  
+  .logo {
+    max-width: 300px;
+    max-height: 300px;
+  }
+  
+  .description-section {
+    .site-title {
+      font-size: 2rem;
+    }
+    
+    .site-description {
+      font-size: 1rem;
+      padding: 0 10px;
+    }
+  }
+  
+  .ai-selection-section {
+    .ai-grid {
+      grid-template-columns: 1fr;
+      max-width: 300px;
+    }
+    
+    .ai-card {
+      padding: 15px;
+    }
+  }
+  
+  .start-game-button {
+    font-size: 1rem;
+    padding: 14px 24px;
+  }
+}
