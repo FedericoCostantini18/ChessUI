@@ -1,16 +1,16 @@
 <div class="chess-board">
   <div class="board-grid">
-    <div 
-      *ngFor="let row of board; let rowIndex = index" 
-      class="board-row"
-    >
-      <app-chess-square
-        *ngFor="let piece of row; let colIndex = index"
-        [piece]="piece"
-        [row]="rowIndex"
-        [col]="colIndex"
-        [isLight]="isLightSquare(rowIndex, colIndex)"
-      ></app-chess-square>
-    </div>
+    @for (row of board; track $index; let rowIndex = $index) {
+      <div class="board-row">
+        @for (piece of row; track $index; let colIndex = $index) {
+          <app-chess-square
+            [piece]="piece"
+            [row]="rowIndex"
+            [col]="colIndex"
+            [isLight]="isLightSquare(rowIndex, colIndex)"
+          ></app-chess-square>
+        }
+      </div>
+    }
   </div>
 </div>

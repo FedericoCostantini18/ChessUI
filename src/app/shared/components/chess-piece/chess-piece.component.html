@@ -1,3 +1,9 @@
-<span class="chess-piece" [class.white]="piece?.color === 'white'" [class.black]="piece?.color === 'black'">
-  {{ getPieceSymbol() }}
-</span>
+@if (piece) {
+  <img 
+    class="chess-piece" 
+    [src]="getPieceImage()" 
+    [alt]="piece.color + ' ' + piece.type"
+    [class.white]="piece.color === 'white'" 
+    [class.black]="piece.color === 'black'"
+  />
+}

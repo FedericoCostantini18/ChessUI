@@ -11,18 +11,22 @@ import { CommonModule } from '@angular/common';
 export class ChessPieceComponent {
   @Input() piece: ChessPiece | null = null;
 
-  getPieceSymbol(): string {
+  getPieceImage(): string {
     if (!this.piece) return '';
     
-    const symbols: { [key: string]: { white: string; black: string } } = {
-      'king': { white: '♔', black: '♚' },
-      'queen': { white: '♕', black: '♛' },
-      'rook': { white: '♖', black: '♜' },
-      'bishop': { white: '♗', black: '♝' },
-      'knight': { white: '♘', black: '♞' },
-      'pawn': { white: '♙', black: '♟' }
+    // Mapping dei tipi di pezzo alle lettere del file
+    const pieceLetters: { [key: string]: string } = {
+      'king': 'K',
+      'queen': 'Q', 
+      'rook': 'R',
+      'bishop': 'B',
+      'knight': 'N',
+      'pawn': 'p'
     };
     
-    return symbols[this.piece.type][this.piece.color];
+    const colorPrefix = this.piece.color === 'white' ? 'w' : 'b';
+    const pieceLetter = pieceLetters[this.piece.type];
+    
+    return `/chessPieces/${colorPrefix}${pieceLetter}.png`;
   }
 }
