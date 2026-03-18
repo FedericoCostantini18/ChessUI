@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ChessSquareComponent } from '../chess-square/chess-square.component';
-import { GameService, ChessPiece, Position } from '../../../core/services/game.service';
+import { GameService, ChessPiece, Position, GameState } from '../../../core/services/game.service';
 
 @Component({
   selector: 'app-chess-board',
@@ -14,11 +14,21 @@ export class ChessBoardComponent implements OnInit {
   selectedSquare: Position | null = null;
   possibleMoves: Position[] = [];
   draggedPiece: { piece: ChessPiece; from: Position } | null = null;
+  gameState: GameState = {
+    isCheck: false,
+    isCheckmate: false,
+    isStalemate: false
+  };
 
   constructor(private gameService: GameService) {}
 
   ngOnInit(): void {
     this.board = this.gameService.getBoard();
+    
+    // Subscribe allo stato del gioco
+    this.gameService.gameState$.subscribe(state => {
+      this.gameState = state;
+    });
   }
 
   isLightSquare(row: number, col: number): boolean {
@@ -97,5 +107,17 @@ export class ChessBoardComponent implements OnInit {
 
   isSquareHighlighted(row: number, col: number): boolean {
     return this.possibleMoves.some(move => move.row === row && move.col === col);
+  }
+
+  isKingInCheck(row: number, col: number): boolean {
+    return this.gameState.isCheck && 
+           this.gameState.checkedKingPosition?.row === row && 
+           this.gameState.checkedKingPosition?.col === col;
+  }
+
+  newGame(): void {
+    this.clearSelection();
+    this.gameService.newGame();
+    this.board = this.gameService.getBoard();
   }
 }

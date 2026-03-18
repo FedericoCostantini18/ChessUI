@@ -15,6 +15,7 @@ export class ChessSquareComponent {
   @Input() isLight: boolean = false;
   @Input() isSelected: boolean = false;
   @Input() isHighlighted: boolean = false;
+  @Input() isKingInCheck: boolean = false;
 
   @Output() squareClick = new EventEmitter<void>();
   @Output() dragStart = new EventEmitter<void>();
@@ -30,6 +31,10 @@ export class ChessSquareComponent {
     
     if (this.isHighlighted) {
       classes += ' highlighted';
+    }
+
+    if (this.isKingInCheck) {
+      classes += ' king-in-check';
     }
 
     return classes;

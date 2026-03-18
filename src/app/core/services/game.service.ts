@@ -15,6 +15,16 @@ export interface Move {
   from: Position;
   to: Position;
   piece: ChessPiece;
+  capturedPiece?: ChessPiece;
+  timestamp: Date;
+  notation: string; // Notazione algebrica
+}
+
+export interface GameState {
+  isCheck: boolean;
+  isCheckmate: boolean;
+  isStalemate: boolean;
+  checkedKingPosition?: Position;
 }
 
 export interface Player {
@@ -33,9 +43,17 @@ export class GameService {
     white: { name: 'Giocatore 1', color: 'white', avatar: '👤' },
     black: { name: 'Giocatore 2', color: 'black', avatar: '👤' }
   });
+  private gameState = new BehaviorSubject<GameState>({
+    isCheck: false,
+    isCheckmate: false,
+    isStalemate: false
+  });
+  private moveHistory: Move[] = [];
+  private readonly STORAGE_KEY = 'chess_move_history';
 
   constructor() {
     this.initializeBoard();
+    this.loadMoveHistory();
   }
 
   get currentPlayer$() {
@@ -44,6 +62,10 @@ export class GameService {
 
   get players$() {
     return this.players.asObservable();
+  }
+
+  get gameState$() {
+    return this.gameState.asObservable();
   }
 
   getBoard(): (ChessPiece | null)[][] {
@@ -123,12 +145,36 @@ export class GameService {
       return false;
     }
 
+    // Verifica che il movimento non metta in scacco il proprio re
+    if (this.wouldBeInCheckAfterMove(from, to, piece.color)) {
+      return false;
+    }
+
+    // Salva il pezzo catturato (se presente)
+    const capturedPiece = this.board[to.row][to.col];
+
     // Esegui il movimento
     this.board[to.row][to.col] = piece;
     this.board[from.row][from.col] = null;
 
+    // Crea la mossa per la cronologia
+    const move: Move = {
+      from,
+      to,
+      piece,
+      capturedPiece: capturedPiece || undefined,
+      timestamp: new Date(),
+      notation: this.generateMoveNotation(from, to, piece, capturedPiece)
+    };
+
+    // Salva la mossa nella cronologia
+    this.addMoveToHistory(move);
+
     // Cambia turno
     this.switchPlayer();
+
+    // Aggiorna lo stato del gioco
+    this.updateGameState();
 
     return true;
   }
@@ -148,28 +194,18 @@ export class GameService {
       return false;
     }
 
-    return this.isValidMove(from, to, piece);
+    // Verifica che il movimento sia valido e non metta in scacco il proprio re
+    return this.isValidMove(from, to, piece) && !this.wouldBeInCheckAfterMove(from, to, piece.color);
   }
 
   getPossibleMoves(position: Position): Position[] {
-    const moves: Position[] = [];
     const piece = this.board[position.row][position.col];
     
     if (!piece || piece.color !== this.currentPlayer.value) {
-      return moves;
+      return [];
     }
 
-    // Controlla tutte le caselle della scacchiera
-    for (let row = 0; row < 8; row++) {
-      for (let col = 0; col < 8; col++) {
-        const to: Position = { row, col };
-        if (this.canMoveTo(position, to)) {
-          moves.push(to);
-        }
-      }
-    }
-
-    return moves;
+    return this.getPossibleMovesForPiece(position);
   }
 
   private isValidPosition(position: Position): boolean {
@@ -246,5 +282,230 @@ export class GameService {
     }
 
     return true;
+  }
+
+  // Metodi per la gestione della cronologia delle mosse
+  private loadMoveHistory(): void {
+    try {
+      const saved = localStorage.getItem(this.STORAGE_KEY);
+      if (saved) {
+        this.moveHistory = JSON.parse(saved).map((move: any) => ({
+          ...move,
+          timestamp: new Date(move.timestamp)
+        }));
+      }
+    } catch (error) {
+      console.error('Errore nel caricamento della cronologia:', error);
+      this.moveHistory = [];
+    }
+  }
+
+  private saveMoveHistory(): void {
+    try {
+      localStorage.setItem(this.STORAGE_KEY, JSON.stringify(this.moveHistory));
+    } catch (error) {
+      console.error('Errore nel salvataggio della cronologia:', error);
+    }
+  }
+
+  private addMoveToHistory(move: Move): void {
+    this.moveHistory.push(move);
+    this.saveMoveHistory();
+  }
+
+  private generateMoveNotation(from: Position, to: Position, piece: ChessPiece, capturedPiece?: ChessPiece | null): string {
+    const files = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
+    const ranks = ['8', '7', '6', '5', '4', '3', '2', '1'];
+    
+    const fromSquare = files[from.col] + ranks[from.row];
+    const toSquare = files[to.col] + ranks[to.row];
+    
+    let notation = '';
+    
+    // Aggiungi il simbolo del pezzo (tranne per i pedoni)
+    if (piece.type !== 'pawn') {
+      const pieceSymbols = {
+        'king': 'K', 'queen': 'Q', 'rook': 'R',
+        'bishop': 'B', 'knight': 'N', 'pawn': ''
+      };
+      notation += pieceSymbols[piece.type];
+    }
+    
+    // Se c'è una cattura
+    if (capturedPiece) {
+      if (piece.type === 'pawn') {
+        notation += files[from.col];
+      }
+      notation += 'x';
+    }
+    
+    notation += toSquare;
+    
+    return notation;
+  }
+
+  // Metodi per la logica di scacco e scaccomatto
+  private findKing(color: 'white' | 'black'): Position | null {
+    for (let row = 0; row < 8; row++) {
+      for (let col = 0; col < 8; col++) {
+        const piece = this.board[row][col];
+        if (piece && piece.type === 'king' && piece.color === color) {
+          return { row, col };
+        }
+      }
+    }
+    return null;
+  }
+
+  private isPositionUnderAttack(position: Position, attackingColor: 'white' | 'black'): boolean {
+    // Controlla se qualche pezzo del colore specificato può attaccare questa posizione
+    for (let row = 0; row < 8; row++) {
+      for (let col = 0; col < 8; col++) {
+        const piece = this.board[row][col];
+        if (piece && piece.color === attackingColor) {
+          // Verifica se questo pezzo può attaccare la posizione target
+          if (this.canPieceAttackPosition({ row, col }, position, piece)) {
+            return true;
+          }
+        }
+      }
+    }
+    return false;
+  }
+
+  private canPieceAttackPosition(from: Position, to: Position, piece: ChessPiece): boolean {
+    // Simile a isValidMove ma senza controllare se il target ha un pezzo dello stesso colore
+    const rowDiff = Math.abs(to.row - from.row);
+    const colDiff = Math.abs(to.col - from.col);
+
+    switch (piece.type) {
+      case 'pawn':
+        return this.canPawnAttackPosition(from, to, piece);
+      case 'rook':
+        return (rowDiff === 0 || colDiff === 0) && this.isPathClear(from, to);
+      case 'bishop':
+        return rowDiff === colDiff && this.isPathClear(from, to);
+      case 'queen':
+        return (rowDiff === 0 || colDiff === 0 || rowDiff === colDiff) && this.isPathClear(from, to);
+      case 'king':
+        return rowDiff <= 1 && colDiff <= 1;
+      case 'knight':
+        return (rowDiff === 2 && colDiff === 1) || (rowDiff === 1 && colDiff === 2);
+      default:
+        return false;
+    }
+  }
+
+  private canPawnAttackPosition(from: Position, to: Position, piece: ChessPiece): boolean {
+    const direction = piece.color === 'white' ? -1 : 1;
+    const rowDiff = to.row - from.row;
+    const colDiff = Math.abs(to.col - from.col);
+    
+    // I pedoni attaccano solo in diagonale
+    return colDiff === 1 && rowDiff === direction;
+  }
+
+  private isInCheck(color: 'white' | 'black'): boolean {
+    const kingPosition = this.findKing(color);
+    if (!kingPosition) {
+      return false;
+    }
+    
+    const opponentColor = color === 'white' ? 'black' : 'white';
+    return this.isPositionUnderAttack(kingPosition, opponentColor);
+  }
+
+  private wouldBeInCheckAfterMove(from: Position, to: Position, color: 'white' | 'black'): boolean {
+    // Simula la mossa per vedere se il re sarebbe in scacco
+    const originalPiece = this.board[from.row][from.col];
+    const capturedPiece = this.board[to.row][to.col];
+    
+    // Esegui temporaneamente la mossa
+    this.board[to.row][to.col] = originalPiece;
+    this.board[from.row][from.col] = null;
+    
+    const wouldBeInCheck = this.isInCheck(color);
+    
+    // Ripristina la posizione originale
+    this.board[from.row][from.col] = originalPiece;
+    this.board[to.row][to.col] = capturedPiece;
+    
+    return wouldBeInCheck;
+  }
+
+  private hasValidMoves(color: 'white' | 'black'): boolean {
+    // Controlla se il giocatore ha mosse valide
+    for (let row = 0; row < 8; row++) {
+      for (let col = 0; col < 8; col++) {
+        const piece = this.board[row][col];
+        if (piece && piece.color === color) {
+          const moves = this.getPossibleMovesForPiece({ row, col });
+          if (moves.length > 0) {
+            return true;
+          }
+        }
+      }
+    }
+    return false;
+  }
+
+  private getPossibleMovesForPiece(position: Position): Position[] {
+    const moves: Position[] = [];
+    const piece = this.board[position.row][position.col];
+    
+    if (!piece) {
+      return moves;
+    }
+
+    // Controlla tutte le caselle della scacchiera
+    for (let row = 0; row < 8; row++) {
+      for (let col = 0; col < 8; col++) {
+        const to: Position = { row, col };
+        if (this.isValidMove(position, to, piece) && !this.wouldBeInCheckAfterMove(position, to, piece.color)) {
+          moves.push(to);
+        }
+      }
+    }
+
+    return moves;
+  }
+
+  private updateGameState(): void {
+    const currentPlayerColor = this.currentPlayer.value;
+    const isCheck = this.isInCheck(currentPlayerColor);
+    const hasValidMoves = this.hasValidMoves(currentPlayerColor);
+    
+    let newState: GameState = {
+      isCheck,
+      isCheckmate: isCheck && !hasValidMoves,
+      isStalemate: !isCheck && !hasValidMoves,
+    };
+
+    if (isCheck) {
+      newState.checkedKingPosition = this.findKing(currentPlayerColor) || undefined;
+    }
+
+    this.gameState.next(newState);
+
+    // Se c'è checkmate o stalemate, la partita è finita
+    if (newState.isCheckmate || newState.isStalemate) {
+      console.log(newState.isCheckmate ? 
+        `Scaccomatto! Vince ${currentPlayerColor === 'white' ? 'nero' : 'bianco'}!` : 
+        'Stallo! Partita patta!');
+    }
+  }
+
+  // Metodo per iniziare una nuova partita
+  newGame(): void {
+    this.initializeBoard();
+    this.currentPlayer.next('white');
+    this.gameState.next({
+      isCheck: false,
+      isCheckmate: false,
+      isStalemate: false
+    });
+    // Pulisce la cronologia per la nuova partita
+    this.moveHistory = [];
+    this.saveMoveHistory();
   }
 }
