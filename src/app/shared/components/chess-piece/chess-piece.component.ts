@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { ChessPiece } from '../../../core/services/game.service';
 import { CommonModule } from '@angular/common';
 
@@ -10,6 +10,9 @@ import { CommonModule } from '@angular/common';
 })
 export class ChessPieceComponent {
   @Input() piece: ChessPiece | null = null;
+
+  @Output() dragStart = new EventEmitter<void>();
+  @Output() dragEnd = new EventEmitter<void>();
 
   getPieceImage(): string {
     if (!this.piece) return '';
@@ -28,5 +31,15 @@ export class ChessPieceComponent {
     const pieceLetter = pieceLetters[this.piece.type];
     
     return `/chessPieces/${colorPrefix}${pieceLetter}.png`;
+  }
+
+  onDragStart(event: DragEvent): void {
+    if (this.piece) {
+      this.dragStart.emit();
+    }
+  }
+
+  onDragEnd(event: DragEvent): void {
+    this.dragEnd.emit();
   }
 }

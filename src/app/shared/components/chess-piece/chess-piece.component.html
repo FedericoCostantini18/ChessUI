@@ -5,5 +5,8 @@
     [alt]="piece.color + ' ' + piece.type"
     [class.white]="piece.color === 'white'" 
     [class.black]="piece.color === 'black'"
+    draggable="true"
+    (dragstart)="onDragStart($event)"
+    (dragend)="onDragEnd($event)"
   />
 }

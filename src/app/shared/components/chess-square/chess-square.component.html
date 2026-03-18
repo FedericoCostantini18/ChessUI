@@ -1,3 +1,14 @@
-<div class="chess-square" [class]="squareClass">
-  <app-chess-piece [piece]="piece"></app-chess-piece>
+<div 
+  class="chess-square" 
+  [class]="squareClass"
+  (click)="onClick()"
+  (dragover)="onDragOver($event)"
+  (dragenter)="onDragEnter($event)"  
+  (drop)="onDrop($event)"
+>
+  <app-chess-piece 
+    [piece]="piece"
+    (dragStart)="onPieceDragStart()"
+    (dragEnd)="onPieceDragEnd()"
+  ></app-chess-piece>
 </div>

@@ -8,6 +8,12 @@
             [row]="rowIndex"
             [col]="colIndex"
             [isLight]="isLightSquare(rowIndex, colIndex)"
+            [isSelected]="isSquareSelected(rowIndex, colIndex)"
+            [isHighlighted]="isSquareHighlighted(rowIndex, colIndex)"
+            (squareClick)="onSquareClick(rowIndex, colIndex)"
+            (dragStart)="onDragStart(rowIndex, colIndex)"
+            (dragEnd)="onDragEnd()"
+            (drop)="onDrop(rowIndex, colIndex)"
           ></app-chess-square>
         }
       </div>
