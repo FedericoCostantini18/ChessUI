@@ -3,7 +3,6 @@
     <span class="avatar">{{ player.avatar }}</span>
     <div class="details">
       <h3>{{ player.name }}</h3>
-      <span class="color">{{ player.color === 'white' ? 'Bianco' : 'Nero' }}</span>
       @if (shouldShowAdvantage()) {
         <span class="advantage">+{{ materialAdvantage.advantage }}</span>
       }

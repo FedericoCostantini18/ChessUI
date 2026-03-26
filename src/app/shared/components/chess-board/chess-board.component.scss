@@ -2,8 +2,6 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 20px;
-  gap: 20px;
   max-width: 800px;
   margin: 0 auto;
 }
@@ -12,7 +10,6 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 20px;
   background: #8b4513;
   border-radius: 8px;
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
@@ -121,10 +118,6 @@
 
 // Responsive design
 @media (max-width: 768px) {
-  .chess-game-container {
-    padding: 10px;
-    gap: 15px;
-  }
 
   .chess-board {
     padding: 10px;

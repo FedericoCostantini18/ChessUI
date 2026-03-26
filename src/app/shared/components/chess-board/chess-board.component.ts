@@ -1,12 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ChessSquareComponent } from '../chess-square/chess-square.component';
-import { PlayerInfoComponent } from '../player-info/player-info.component';
 import { GameService, ChessPiece, Position, GameState, Player } from '../../../core/services/game.service';
 
 @Component({
   selector: 'app-chess-board',
-  imports: [CommonModule, ChessSquareComponent, PlayerInfoComponent],
+  imports: [CommonModule, ChessSquareComponent],
   templateUrl: './chess-board.component.html',
   styleUrl: './chess-board.component.scss'
 })

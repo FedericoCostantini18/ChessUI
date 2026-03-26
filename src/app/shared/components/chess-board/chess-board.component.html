@@ -17,28 +17,26 @@
   }
 
   <!-- Scacchiera -->
-  <div class="chess-board">
-    <div class="board-grid">
-      @for (row of board; track $index; let rowIndex = $index) {
-        <div class="board-row">
-          @for (piece of row; track $index; let colIndex = $index) {
-            <app-chess-square
-              [piece]="piece"
-              [row]="rowIndex"
-              [col]="colIndex"
-              [isLight]="isLightSquare(rowIndex, colIndex)"
-              [isSelected]="isSquareSelected(rowIndex, colIndex)"
-              [isHighlighted]="isSquareHighlighted(rowIndex, colIndex)"
-              [isKingInCheck]="isKingInCheck(rowIndex, colIndex)"
-              (squareClick)="onSquareClick(rowIndex, colIndex)"
-              (dragStart)="onDragStart(rowIndex, colIndex)"
-              (dragEnd)="onDragEnd()"
-              (drop)="onDrop(rowIndex, colIndex)"
-            ></app-chess-square>
-          }
-        </div>
-      }
-    </div>
+  <div class="board-grid">
+    @for (row of board; track $index; let rowIndex = $index) {
+      <div class="board-row">
+        @for (piece of row; track $index; let colIndex = $index) {
+          <app-chess-square
+            [piece]="piece"
+            [row]="rowIndex"
+            [col]="colIndex"
+            [isLight]="isLightSquare(rowIndex, colIndex)"
+            [isSelected]="isSquareSelected(rowIndex, colIndex)"
+            [isHighlighted]="isSquareHighlighted(rowIndex, colIndex)"
+            [isKingInCheck]="isKingInCheck(rowIndex, colIndex)"
+            (squareClick)="onSquareClick(rowIndex, colIndex)"
+            (dragStart)="onDragStart(rowIndex, colIndex)"
+            (dragEnd)="onDragEnd()"
+            (drop)="onDrop(rowIndex, colIndex)"
+          ></app-chess-square>
+        }
+      </div>
+    }
   </div>
 
 </div>
