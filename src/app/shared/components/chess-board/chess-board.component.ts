@@ -1,11 +1,12 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ChessSquareComponent } from '../chess-square/chess-square.component';
-import { GameService, ChessPiece, Position, GameState } from '../../../core/services/game.service';
+import { PlayerInfoComponent } from '../player-info/player-info.component';
+import { GameService, ChessPiece, Position, GameState, Player } from '../../../core/services/game.service';
 
 @Component({
   selector: 'app-chess-board',
-  imports: [CommonModule, ChessSquareComponent],
+  imports: [CommonModule, ChessSquareComponent, PlayerInfoComponent],
   templateUrl: './chess-board.component.html',
   styleUrl: './chess-board.component.scss'
 })
@@ -19,6 +20,11 @@ export class ChessBoardComponent implements OnInit {
     isCheckmate: false,
     isStalemate: false
   };
+  players: { white: Player; black: Player } = {
+    white: { name: 'Giocatore 1', color: 'white', avatar: '👤' },
+    black: { name: 'Giocatore 2', color: 'black', avatar: '👤' }
+  };
+  currentPlayer: 'white' | 'black' = 'white';
 
   constructor(private gameService: GameService) {}
 
@@ -28,6 +34,16 @@ export class ChessBoardComponent implements OnInit {
     // Subscribe allo stato del gioco
     this.gameService.gameState$.subscribe(state => {
       this.gameState = state;
+    });
+
+    // Subscribe ai giocatori
+    this.gameService.players$.subscribe(players => {
+      this.players = players;
+    });
+
+    // Subscribe al giocatore corrente
+    this.gameService.currentPlayer$.subscribe(currentPlayer => {
+      this.currentPlayer = currentPlayer;
     });
   }
 

@@ -1,37 +1,24 @@
 <div class="game-page">
   <!-- Info giocatori -->
   @if (players$ | async; as players) {
-    <!-- Giocatore Nero (sopra) -->
-    <div class="player-card black-player top-player">
-      <div class="player-avatar">{{ players.black.avatar }}</div>
-      <div class="player-info">
-        <h3>{{ players.black.name }}</h3>
-        <span class="player-color">Nero</span>
-      </div>
-      @if ((currentPlayer$ | async) === 'black') {
-        <div class="current-turn">
-          <span class="turn-indicator">🎯</span>
-        </div>
-      }
-    </div>
+    
+
+    <!-- Giocatore Nero (in alto) -->
+    <app-player-info 
+      [player]="players.black" 
+      [isCurrentPlayer]="(currentPlayer$ | async) === 'black'"
+    ></app-player-info>
   
     <!-- Scacchiera -->
     <div class="board-container">
       <app-chess-board></app-chess-board>
     </div>
 
-    <!-- Giocatore Bianco (sotto) -->
-    <div class="player-card white-player bottom-player">
-      <div class="player-avatar">{{ players.white.avatar }}</div>
-      <div class="player-info">
-        <h3>{{ players.white.name }}</h3>
-        <span class="player-color">Bianco</span>
-      </div>
-      @if ((currentPlayer$ | async) === 'white') {
-        <div class="current-turn">
-          <span class="turn-indicator">🎯</span>
-        </div>
-      }
-    </div>
+    <!-- Giocatore Bianco (in basso) -->
+    <app-player-info 
+      [player]="players.white" 
+      [isCurrentPlayer]="(currentPlayer$ | async) === 'white'"
+    ></app-player-info>
+
   }
 </div>

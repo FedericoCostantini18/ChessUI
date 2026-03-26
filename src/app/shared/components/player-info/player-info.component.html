@@ -1,0 +1,25 @@
+<div class="player-card" [class.current]="isCurrentPlayer">
+  <div class="player-info">
+    <span class="avatar">{{ player.avatar }}</span>
+    <div class="details">
+      <h3>{{ player.name }}</h3>
+      <span class="color">{{ player.color === 'white' ? 'Bianco' : 'Nero' }}</span>
+      @if (shouldShowAdvantage()) {
+        <span class="advantage">+{{ materialAdvantage.advantage }}</span>
+      }
+    </div>
+  </div>
+  
+  <div class="captured">
+    @if (capturedPieces.length !== 0) {
+      @for (pieceGroup of getCapturedPiecesByType() | keyvalue; track pieceGroup.key) {
+        <div class="piece-group">
+          <img [src]="getPieceImage(pieceGroup.value[0])" [alt]="pieceGroup.key" class="piece-img">
+          @if (pieceGroup.value.length > 1) {
+            <span class="count">{{ pieceGroup.value.length }}</span>
+          }
+        </div>
+      }
+    }
+  </div>
+</div>

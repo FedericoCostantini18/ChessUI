@@ -1,0 +1,284 @@
+.player-card {
+  width: 528px; /* Larghezza fissa uguale alla scacchiera */
+  padding: 16px;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  transition: all 0.3s ease;
+  
+  &.current {
+    background: rgba(255, 255, 255, 0.15);
+    box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
+  }
+}
+
+.player-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.avatar {
+  font-size: 2.2rem;
+  width: 45px;
+  height: 45px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+}
+
+.details {
+  h3 {
+    margin: 0 0 2px 0;
+    font-size: 1rem;
+    font-weight: 600;
+    color: white;
+  }
+  
+  .color {
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.7);
+    margin-right: 8px;
+  }
+  
+  .advantage {
+    background: rgba(76, 175, 80, 0.8);
+    color: white;
+    padding: 2px 6px;
+    font-size: 0.7rem;
+    font-weight: bold;
+  }
+}
+
+.captured {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  
+  .no-pieces {
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.5);
+  }
+}
+
+.piece-group {
+  position: relative;
+  display: inline-block;
+  
+  .piece-img {
+    width: 20px;
+    height: 20px;
+    opacity: 0.8;
+  }
+  
+  .count {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    background: rgba(255, 87, 34, 0.9);
+    color: white;
+    font-size: 0.6rem;
+    padding: 1px 4px;
+    font-weight: bold;
+    min-width: 12px;
+    text-align: center;
+  }
+}
+
+.pieces-container {
+  min-height: 40px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+.no-captures {
+  color: #6c757d;
+  font-style: italic;
+  font-size: 0.9rem;
+}
+
+.piece-group {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+
+  .captured-piece-img {
+    width: 32px;
+    height: 32px;
+    object-fit: contain;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+    opacity: 0.8;
+  }
+
+  .piece-count {
+    position: absolute;
+    top: -6px;
+    right: -6px;
+    background: #dc3545;
+    color: white;
+    font-size: 0.7rem;
+    font-weight: bold;
+    width: 18px;
+    height: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+  }
+}
+
+.game-page {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #2c3e50, #4a6741);
+  padding: 15px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 15px;
+  max-width: 100vw;
+  overflow: hidden;
+}
+
+.player-card {
+  background: rgba(255, 255, 255, 0.1);
+  padding: 15px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  backdrop-filter: blur(10px);
+  width: 528px;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+  }
+  
+  &.white-player {
+    border-left: 5px solid #f8f8f8;
+  }
+  
+  &.black-player {
+    border-left: 5px solid #333;
+  }
+  
+  &.top-player {
+    // Giocatore nero in alto, orientato normalmente
+    flex-direction: row;
+  }
+  
+  &.bottom-player {
+    // Giocatore bianco in basso, orientato invertito
+    flex-direction: row-reverse;
+  }
+}
+
+.player-avatar {
+  font-size: 2.5rem;
+  width: 50px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.1);
+  flex-shrink: 0;
+}
+
+.player-info {
+  text-align: center;
+  flex: 1;
+  
+  h3 {
+    margin: 0 0 5px 0;
+    color: white;
+    font-size: 1.1rem;
+  }
+  
+  .player-color {
+    color: #b0b0b0;
+    font-size: 0.9rem;
+  }
+}
+
+.current-turn {
+  flex-shrink: 0;
+  
+  .turn-indicator {
+    font-size: 1.3rem;
+    animation: pulse 1.5s ease-in-out infinite;
+  }
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.2);
+    opacity: 0.7;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.board-container {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  max-width: 500px;
+  width: 100%;
+}
+
+// Responsive per schermi piccoli
+@media (max-width: 768px) {
+  .game-page {
+    padding: 10px;
+    gap: 10px;
+  }
+  
+  .player-card {
+    padding: 12px 15px;
+    max-width: 95vw;
+  }
+  
+  .player-avatar {
+    font-size: 2rem;
+    width: 45px;
+    height: 45px;
+  }
+  
+  .player-info h3 {
+    font-size: 1rem;
+  }
+  
+  .current-turn .turn-indicator {
+    font-size: 1.1rem;
+  }
+}
+
+// Responsive per schermi molto piccoli
+@media (max-width: 480px) {
+  .game-page {
+    padding: 8px;
+    gap: 8px;
+  }
+  
+  .player-card {
+    padding: 10px 12px;
+  }
+  
+  .player-avatar {
+    font-size: 1.8rem;
+    width: 40px;
+    height: 40px;
+  }
+}

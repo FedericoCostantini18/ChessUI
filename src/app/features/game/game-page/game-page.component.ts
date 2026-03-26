@@ -3,10 +3,11 @@ import { CommonModule } from '@angular/common';
 import { ChessBoardComponent } from '../../../shared/components/chess-board/chess-board.component';
 import { GameService, Player } from '../../../core/services/game.service';
 import { Observable } from 'rxjs';
+import { PlayerInfoComponent } from '../../../shared/components/player-info/player-info.component';
 
 @Component({
   selector: 'app-game-page',
-  imports: [CommonModule, ChessBoardComponent],
+  imports: [CommonModule, ChessBoardComponent, PlayerInfoComponent],
   templateUrl: './game-page.component.html',
   styleUrl: './game-page.component.scss'
 })

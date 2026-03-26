@@ -27,6 +27,16 @@ export interface GameState {
   checkedKingPosition?: Position;
 }
 
+export interface CapturedPieces {
+  white: ChessPiece[];
+  black: ChessPiece[];
+}
+
+export interface MaterialAdvantage {
+  player: 'white' | 'black' | 'equal';
+  advantage: number;
+}
+
 export interface Player {
   name: string;
   color: 'white' | 'black';
@@ -48,8 +58,22 @@ export class GameService {
     isCheckmate: false,
     isStalemate: false
   });
+  private capturedPieces = new BehaviorSubject<CapturedPieces>({
+    white: [],
+    black: []
+  });
   private moveHistory: Move[] = [];
   private readonly STORAGE_KEY = 'chess_move_history';
+
+  // Valori dei pezzi per il calcolo del vantaggio di materiale
+  private readonly PIECE_VALUES: { [key: string]: number } = {
+    'pawn': 1,
+    'knight': 3,
+    'bishop': 3,
+    'rook': 5,
+    'queen': 9,
+    'king': 0
+  };
 
   constructor() {
     this.initializeBoard();
@@ -68,8 +92,39 @@ export class GameService {
     return this.gameState.asObservable();
   }
 
+  get capturedPieces$() {
+    return this.capturedPieces.asObservable();
+  }
+
   getBoard(): (ChessPiece | null)[][] {
     return this.board;
+  }
+
+  getMaterialAdvantage(): MaterialAdvantage {
+    const captured = this.capturedPieces.value;
+    
+    let whitePoints = 0;
+    let blackPoints = 0;
+
+    // Calcola i punti dei pezzi catturati dal bianco (pezzi neri catturati)
+    captured.white.forEach(piece => {
+      whitePoints += this.PIECE_VALUES[piece.type];
+    });
+
+    // Calcola i punti dei pezzi catturati dal nero (pezzi bianchi catturati)
+    captured.black.forEach(piece => {
+      blackPoints += this.PIECE_VALUES[piece.type];
+    });
+
+    const difference = whitePoints - blackPoints;
+
+    if (difference > 0) {
+      return { player: 'white', advantage: difference };
+    } else if (difference < 0) {
+      return { player: 'black', advantage: Math.abs(difference) };
+    } else {
+      return { player: 'equal', advantage: 0 };
+    }
   }
 
   private initializeBoard(): void {
@@ -156,6 +211,11 @@ export class GameService {
     // Esegui il movimento
     this.board[to.row][to.col] = piece;
     this.board[from.row][from.col] = null;
+
+    // Aggiorna i pezzi catturati se c'è stata una cattura
+    if (capturedPiece) {
+      this.addCapturedPiece(capturedPiece, piece.color);
+    }
 
     // Crea la mossa per la cronologia
     const move: Move = {
@@ -504,8 +564,26 @@ export class GameService {
       isCheckmate: false,
       isStalemate: false
     });
+    this.capturedPieces.next({
+      white: [],
+      black: []
+    });
     // Pulisce la cronologia per la nuova partita
     this.moveHistory = [];
     this.saveMoveHistory();
+  }
+
+  private addCapturedPiece(capturedPiece: ChessPiece, capturedBy: 'white' | 'black'): void {
+    const currentCaptured = this.capturedPieces.value;
+    
+    if (capturedBy === 'white') {
+      // Il bianco ha catturato un pezzo nero
+      currentCaptured.white.push(capturedPiece);
+    } else {
+      // Il nero ha catturato un pezzo bianco  
+      currentCaptured.black.push(capturedPiece);
+    }
+    
+    this.capturedPieces.next(currentCaptured);
   }
 }

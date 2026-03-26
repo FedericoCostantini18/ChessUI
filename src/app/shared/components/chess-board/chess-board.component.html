@@ -1,24 +1,44 @@
-<div class="chess-board">
+<div class="chess-game-container">
+  
 
-  <div class="board-grid">
-    @for (row of board; track $index; let rowIndex = $index) {
-      <div class="board-row">
-        @for (piece of row; track $index; let colIndex = $index) {
-          <app-chess-square
-            [piece]="piece"
-            [row]="rowIndex"
-            [col]="colIndex"
-            [isLight]="isLightSquare(rowIndex, colIndex)"
-            [isSelected]="isSquareSelected(rowIndex, colIndex)"
-            [isHighlighted]="isSquareHighlighted(rowIndex, colIndex)"
-            [isKingInCheck]="isKingInCheck(rowIndex, colIndex)"
-            (squareClick)="onSquareClick(rowIndex, colIndex)"
-            (dragStart)="onDragStart(rowIndex, colIndex)"
-            (dragEnd)="onDragEnd()"
-            (drop)="onDrop(rowIndex, colIndex)"
-          ></app-chess-square>
-        }
-      </div>
-    }
+  <!-- Messaggi di stato del gioco -->
+  @if (gameState.isCheckmate) {
+    <div class="game-status checkmate">
+      <h3>🏆 Scaccomatto!</h3>
+      <p>La partita è terminata</p>
+      <button (click)="newGame()" class="new-game-btn">Nuova Partita</button>
+    </div>
+  } @else if (gameState.isStalemate) {
+    <div class="game-status stalemate">
+      <h3>🤝 Stallo!</h3>
+      <p>Partita patta</p>
+      <button (click)="newGame()" class="new-game-btn">Nuova Partita</button>
+    </div>
+  }
+
+  <!-- Scacchiera -->
+  <div class="chess-board">
+    <div class="board-grid">
+      @for (row of board; track $index; let rowIndex = $index) {
+        <div class="board-row">
+          @for (piece of row; track $index; let colIndex = $index) {
+            <app-chess-square
+              [piece]="piece"
+              [row]="rowIndex"
+              [col]="colIndex"
+              [isLight]="isLightSquare(rowIndex, colIndex)"
+              [isSelected]="isSquareSelected(rowIndex, colIndex)"
+              [isHighlighted]="isSquareHighlighted(rowIndex, colIndex)"
+              [isKingInCheck]="isKingInCheck(rowIndex, colIndex)"
+              (squareClick)="onSquareClick(rowIndex, colIndex)"
+              (dragStart)="onDragStart(rowIndex, colIndex)"
+              (dragEnd)="onDragEnd()"
+              (drop)="onDrop(rowIndex, colIndex)"
+            ></app-chess-square>
+          }
+        </div>
+      }
+    </div>
   </div>
+
 </div>
