@@ -13,9 +13,8 @@
     @if (capturedPieces.length !== 0) {
       @for (pieceGroup of getCapturedPiecesByType() | keyvalue; track pieceGroup.key) {
         <div class="piece-group">
-          <img [src]="getPieceImage(pieceGroup.value[0])" [alt]="pieceGroup.key" class="piece-img">
-          @if (pieceGroup.value.length > 1) {
-            <span class="count">{{ pieceGroup.value.length }}</span>
+          @for (piece of pieceGroup.value; track piece) {
+            <img [src]="getPieceImage(piece)" [alt]="piece.type" class="piece-img">
           }
         </div>
       }

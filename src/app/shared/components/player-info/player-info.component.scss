@@ -50,7 +50,7 @@
 .captured {
   display: flex;
   flex-wrap: wrap;
-  gap: 4px;
+  gap: 3px;
   
   .no-pieces {
     font-size: 0.75rem;
@@ -59,43 +59,25 @@
 }
 
 .piece-group {
-  position: relative;
-  display: inline-block;
+  display: flex;
   align-items: center;
-
-  .piece-count {
-    position: absolute;
-    top: -6px;
-    right: -6px;
-    background: #dc3545;
-    color: white;
-    font-size: 0.7rem;
-    font-weight: bold;
-    width: 18px;
-    height: 18px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
-  }
+  margin-right: 6px;
   
   .piece-img {
-    width: 20px;
-    height: 20px;
+    width: 24px;
+    height: 24px;
     opacity: 0.8;
-  }
-  
-  .count {
-    position: absolute;
-    top: -5px;
-    right: -5px;
-    background: rgba(255, 87, 34, 0.9);
-    color: white;
-    font-size: 0.6rem;
-    padding: 1px 4px;
-    font-weight: bold;
-    min-width: 12px;
-    text-align: center;
+    position: relative;
+    transition: opacity 0.2s ease;
+    
+    &:not(:first-child) {
+      margin-left: -8px;
+    }
+    
+    &:hover {
+      opacity: 1;
+      z-index: 10;
+    }
   }
 }
 
