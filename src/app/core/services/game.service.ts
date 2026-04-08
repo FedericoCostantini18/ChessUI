@@ -18,6 +18,8 @@ export interface Move {
   capturedPiece?: ChessPiece;
   timestamp: Date;
   notation: string; // Notazione algebrica
+  isEnPassant?: boolean; // True se é una cattura en passant
+  isPawnDoubleMove?: boolean; // True se é un movimento doppio di pedone
 }
 
 export interface GameState {
@@ -113,6 +115,10 @@ export class GameService {
 
   getBoard(): (ChessPiece | null)[][] {
     return this.board;
+  }
+
+  getLastMove(): Move | null {
+    return this.moveHistory.length > 0 ? this.moveHistory[this.moveHistory.length - 1] : null;
   }
 
   getMaterialAdvantage(): MaterialAdvantage {
@@ -220,10 +226,33 @@ export class GameService {
       return false;
     }
 
-    // Salva il pezzo catturato (se presente)
-    const capturedPiece = this.board[to.row][to.col];
+    // Rileva se è un movimento en passant o doppio movimento di pedone
+    let isEnPassant = false;
+    let isPawnDoubleMove = false;
+    let capturedPiece = this.board[to.row][to.col];
 
-    // Esegui il movimento
+    if (piece.type === 'pawn') {
+      // Controlla se è un doppio movimento di pedone
+      const startRow = piece.color === 'white' ? 6 : 1;
+      if (from.row === startRow && Math.abs(to.row - from.row) === 2) {
+        isPawnDoubleMove = true;
+      }
+
+      // Controlla se è una cattura en passant
+      if (Math.abs(to.col - from.col) === 1 && !this.board[to.row][to.col]) {
+        if (this.isValidEnPassant(from, to, piece)) {
+          isEnPassant = true;
+          // Per en passant, il pedone catturato è sulla stessa riga del pedone che muove
+          const capturedPawnRow = from.row;
+          const capturedPawnCol = to.col;
+          capturedPiece = this.board[capturedPawnRow][capturedPawnCol];
+          // Rimuovi il pedone catturato dalla sua posizione
+          this.board[capturedPawnRow][capturedPawnCol] = null;
+        }
+      }
+    }
+
+    // Esegui il movimento normale  
     this.board[to.row][to.col] = piece;
     this.board[from.row][from.col] = null;
 
@@ -251,7 +280,9 @@ export class GameService {
       piece,
       capturedPiece: capturedPiece || undefined,
       timestamp: new Date(),
-      notation: this.generateMoveNotation(from, to, piece, capturedPiece)
+      notation: this.generateMoveNotation(from, to, piece, capturedPiece, isEnPassant),
+      isEnPassant: isEnPassant || undefined,
+      isPawnDoubleMove: isPawnDoubleMove || undefined
     };
 
     // Salva la mossa nella cronologia
@@ -345,12 +376,47 @@ export class GameService {
       return true;
     }
 
-    // Cattura in diagonale
+    // Cattura in diagonale normale
     if (colDiff === 1 && rowDiff === direction && this.board[to.row][to.col]) {
       return true;
     }
 
+    // Cattura en passant
+    if (colDiff === 1 && rowDiff === direction && !this.board[to.row][to.col]) {
+      return this.isValidEnPassant(from, to, piece);
+    }
+
     return false;
+  }
+
+  private isValidEnPassant(from: Position, to: Position, piece: ChessPiece): boolean {
+    // En passant è possibile solo dalla quinta traversa per i bianchi (riga 3) o quarta per i neri (riga 4) 
+    const enPassantRow = piece.color === 'white' ? 3 : 4;
+    if (from.row !== enPassantRow) {
+      return false;
+    }
+
+    // Posizione del pedone avversario che potrebbe essere catturato
+    const capturedPawnRow = piece.color === 'white' ? 3 : 4; // Stessa riga del nostro pedone
+    const capturedPawnCol = to.col;
+    const capturedPawn = this.board[capturedPawnRow][capturedPawnCol];
+
+    // Deve esserci un pedone avversario nella posizione adiacente
+    if (!capturedPawn || capturedPawn.type !== 'pawn' || capturedPawn.color === piece.color) {
+      return false;
+    }
+
+    // L'ultima mossa deve essere stata un doppio movimento di questo pedone
+    const lastMove = this.getLastMove();
+    if (!lastMove || !lastMove.isPawnDoubleMove) {
+      return false;
+    }
+
+    // L'ultima mossa deve aver portato il pedone nella posizione adiacente
+    return lastMove.to.row === capturedPawnRow && 
+           lastMove.to.col === capturedPawnCol &&
+           lastMove.piece.type === 'pawn' &&
+           lastMove.piece.color === capturedPawn.color;
   }
 
   private isPathClear(from: Position, to: Position): boolean {
@@ -467,7 +533,7 @@ export class GameService {
     return notation;
   }
 
-  private generateMoveNotation(from: Position, to: Position, piece: ChessPiece, capturedPiece?: ChessPiece | null): string {
+  private generateMoveNotation(from: Position, to: Position, piece: ChessPiece, capturedPiece?: ChessPiece | null, isEnPassant: boolean = false): string {
     const files = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
     const ranks = ['8', '7', '6', '5', '4', '3', '2', '1'];
     
@@ -485,8 +551,8 @@ export class GameService {
       notation += pieceSymbols[piece.type];
     }
     
-    // Se c'è una cattura
-    if (capturedPiece) {
+    // Se c'è una cattura (normale o en passant)
+    if (capturedPiece || isEnPassant) {
       if (piece.type === 'pawn') {
         notation += files[from.col];
       }
@@ -494,6 +560,11 @@ export class GameService {
     }
     
     notation += toSquare;
+    
+    // Aggiungi " e.p." per le mosse en passant
+    if (isEnPassant) {
+      notation += ' e.p.';
+    }
     
     return notation;
   }
