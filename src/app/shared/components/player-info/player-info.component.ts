@@ -21,11 +21,8 @@ export class PlayerInfoComponent implements OnInit {
     this.gameService.capturedPieces$.subscribe((captured: CapturedPieces) => {
       if (this.player) {
         this.capturedPieces = captured[this.player.color];
+        this.materialAdvantage = this.gameService.getMaterialAdvantage();
       }
-    });
-
-    this.gameService.capturedPieces$.subscribe(() => {
-      this.materialAdvantage = this.gameService.getMaterialAdvantage();
     });
   }
 

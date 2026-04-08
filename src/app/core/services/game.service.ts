@@ -43,6 +43,16 @@ export interface Player {
   avatar: string;
 }
 
+export interface PawnPromotion {
+  position: Position;
+  color: 'white' | 'black';
+  move: {
+    from: Position;
+    to: Position;
+    capturedPiece?: ChessPiece;
+  };
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -62,6 +72,7 @@ export class GameService {
     white: [],
     black: []
   });
+  private pendingPromotion = new BehaviorSubject<PawnPromotion | null>(null);
   private moveHistory: Move[] = [];
   private readonly STORAGE_KEY = 'chess_move_history';
 
@@ -94,6 +105,10 @@ export class GameService {
 
   get capturedPieces$() {
     return this.capturedPieces.asObservable();
+  }
+
+  get pendingPromotion$() {
+    return this.pendingPromotion.asObservable();
   }
 
   getBoard(): (ChessPiece | null)[][] {
@@ -215,6 +230,18 @@ export class GameService {
     // Aggiorna i pezzi catturati se c'è stata una cattura
     if (capturedPiece) {
       this.addCapturedPiece(capturedPiece, piece.color);
+    }
+
+    // Controlla se è necessaria una promozione del pedone
+    if (piece.type === 'pawn' && this.isPawnPromotionRequired(to, piece.color)) {
+      // Imposta la promozione in sospeso
+      this.pendingPromotion.next({
+        position: to,
+        color: piece.color,
+        move: { from, to, capturedPiece: capturedPiece || undefined }
+      });
+      // Non cambiare turno né aggiornare lo stato del gioco fino alla promozione
+      return true;
     }
 
     // Crea la mossa per la cronologia
@@ -371,6 +398,73 @@ export class GameService {
   private addMoveToHistory(move: Move): void {
     this.moveHistory.push(move);
     this.saveMoveHistory();
+  }
+
+  // Metodi per la promozione dei pedoni
+  private isPawnPromotionRequired(position: Position, color: 'white' | 'black'): boolean {
+    // I pedoni bianchi si promuovono alla riga 0, i neri alla riga 7
+    return (color === 'white' && position.row === 0) || 
+           (color === 'black' && position.row === 7);
+  }
+
+  completePawnPromotion(pieceType: 'queen' | 'rook' | 'bishop' | 'knight'): void {
+    const promotion = this.pendingPromotion.value;
+    if (!promotion) {
+      return;
+    }
+
+    // Sostituisci il pedone con il nuovo pezzo
+    this.board[promotion.position.row][promotion.position.col] = {
+      type: pieceType,
+      color: promotion.color
+    };
+
+    // Crea la mossa per la cronologia con notazione di promozione
+    const move: Move = {
+      from: promotion.move.from,
+      to: promotion.move.to,
+      piece: { type: 'pawn', color: promotion.color },
+      capturedPiece: promotion.move.capturedPiece,
+      timestamp: new Date(),
+      notation: this.generatePromotionNotation(promotion.move.from, promotion.move.to, promotion.color, pieceType, promotion.move.capturedPiece)
+    };
+
+    // Salva la mossa nella cronologia
+    this.addMoveToHistory(move);
+
+    // Pulisce la promozione in sospeso
+    this.pendingPromotion.next(null);
+
+    // Cambia turno
+    this.switchPlayer();
+
+    // Aggiorna lo stato del gioco
+    this.updateGameState();
+  }
+
+  private generatePromotionNotation(from: Position, to: Position, color: 'white' | 'black', promotedPiece: 'queen' | 'rook' | 'bishop' | 'knight', capturedPiece?: ChessPiece): string {
+    const files = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
+    const ranks = ['8', '7', '6', '5', '4', '3', '2', '1'];
+    const toSquare = files[to.col] + ranks[to.row];
+    
+    const pieceSymbols = {
+      'queen': 'Q',
+      'rook': 'R',
+      'bishop': 'B',
+      'knight': 'N'
+    };
+
+    let notation = '';
+
+    // Se c'è una cattura
+    if (capturedPiece) {
+      notation += files[from.col] + 'x';
+    }
+
+    // Casella di destinazione + simbolo promozione
+    notation += toSquare + '=' + pieceSymbols[promotedPiece];
+
+    return notation;
   }
 
   private generateMoveNotation(from: Position, to: Position, piece: ChessPiece, capturedPiece?: ChessPiece | null): string {

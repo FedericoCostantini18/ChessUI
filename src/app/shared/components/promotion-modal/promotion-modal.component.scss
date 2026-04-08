@@ -1,0 +1,141 @@
+.promotion-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  animation: fadeIn 0.2s ease-in;
+}
+
+.promotion-modal {
+  background: white;
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  max-width: 500px;
+  width: 90%;
+  animation: modalSlideIn 0.3s ease-out;
+}
+
+.modal-header {
+  text-align: center;
+  margin-bottom: 1.5rem;
+  
+  h3 {
+    margin: 0 0 0.5rem 0;
+    color: #2c3e50;
+    font-size: 1.4rem;
+    font-weight: 600;
+  }
+  
+  p {
+    margin: 0;
+    color: #7f8c8d;
+    font-size: 0.9rem;
+  }
+}
+
+.piece-selection {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+}
+
+.piece-button {
+  background: white;
+  border: 2px solid #e1e8ed;
+  border-radius: 8px;
+  padding: 1rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: 100px;
+
+  &:hover {
+    border-color: #3498db;
+    background-color: #f8f9fa;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(52, 152, 219, 0.15);
+  }
+
+  &:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 6px rgba(52, 152, 219, 0.2);
+  }
+}
+
+.piece-image-container {
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.piece-image {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.piece-label {
+  font-weight: 500;
+  color: #2c3e50;
+  font-size: 0.9rem;
+}
+
+// Animations
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes modalSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+// Responsive design
+@media (max-width: 480px) {
+  .promotion-modal {
+    padding: 1rem;
+    margin: 1rem;
+  }
+  
+  .piece-selection {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.5rem;
+  }
+  
+  .piece-button {
+    padding: 0.75rem 0.5rem;
+    min-height: 80px;
+  }
+  
+  .piece-image-container {
+    width: 36px;
+    height: 36px;
+  }
+  
+  .piece-label {
+    font-size: 0.8rem;
+  }
+}

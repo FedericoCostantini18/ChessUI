@@ -4,10 +4,11 @@ import { ChessBoardComponent } from '../../../shared/components/chess-board/ches
 import { GameService, Player } from '../../../core/services/game.service';
 import { Observable } from 'rxjs';
 import { PlayerInfoComponent } from '../../../shared/components/player-info/player-info.component';
+import { PromotionModalComponent } from '../../../shared/components/promotion-modal/promotion-modal.component';
 
 @Component({
   selector: 'app-game-page',
-  imports: [CommonModule, ChessBoardComponent, PlayerInfoComponent],
+  imports: [CommonModule, ChessBoardComponent, PlayerInfoComponent, PromotionModalComponent],
   templateUrl: './game-page.component.html',
   styleUrl: './game-page.component.scss'
 })

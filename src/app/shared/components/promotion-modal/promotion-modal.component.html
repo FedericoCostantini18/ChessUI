@@ -1,0 +1,31 @@
+<!-- Modal overlay -->
+<div 
+  class="promotion-modal-overlay" 
+  *ngIf="currentPromotion"
+  (click)="$event.stopPropagation()">
+  
+  <div class="promotion-modal">
+    <div class="modal-header">
+      <h3>Scegli il pezzo per la promozione</h3>
+      <p>Seleziona in quale pezzo trasformare il pedone:</p>
+    </div>
+
+    <div class="piece-selection">
+      <button 
+        *ngFor="let option of pieceOptions"
+        class="piece-button"
+        (click)="onPieceSelect(option.type)"
+        [title]="option.label">
+        
+        <div class="piece-image-container">
+          <img 
+            [src]="getPieceImagePath(option.type, currentPromotion!.color)"
+            [alt]="option.label"
+            class="piece-image"
+            draggable="false">
+        </div>
+        <span class="piece-label">{{ option.label }}</span>
+      </button>
+    </div>
+  </div>
+</div>
